@@ -1,0 +1,49 @@
+{% extends 'base.html' %} 
+{% block content %}
+
+<div class="container">
+    <h1 class="mb-4">Movie Recommendation System</h1>
+    <p class="lead">Enter a description to find the most similar movie based on embeddings and cosine similarity.</p>
+    
+    <form method="POST" action="{% url 'recommendation' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="prompt" class="form-label">
+                Enter movie description or theme:
+            </label>
+            <input type="text" class="form-control" name="prompt" id="prompt" value="{{ prompt }}" placeholder="e.g., 'movie about space exploration' or 'romantic comedy'"/>
+        </div>
+        <button type="submit" class="btn btn-primary">Get Recommendation</button>
+    </form>   
+    
+    {% if recommended_movie %}
+    <div class="mt-5">
+        <h2 class="mb-3">Recommended Movie</h2>
+        <div class="card">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    {% if recommended_movie.image %}
+                    <img src="{{ recommended_movie.image.url }}" class="img-fluid rounded-start" alt="{{ recommended_movie.title }}">
+                    {% else %}
+                    <img src="/media/movie/images/default.jpg" class="img-fluid rounded-start" alt="Default image">
+                    {% endif %}
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h3 class="card-title fw-bold">{{ recommended_movie.title }}</h3>
+                        <p class="card-text">{{ recommended_movie.description }}</p>
+                        <p class="card-text"><strong>Genre:</strong> {{ recommended_movie.genre|default:"Not specified" }}</p>
+                        <p class="card-text"><strong>Year:</strong> {{ recommended_movie.year|default:"Not specified" }}</p>
+                        <p class="card-text"><strong>Similarity Score:</strong> {{ similarity_score|floatformat:4 }}</p>
+                        {% if recommended_movie.url %}
+                        <a href="{{ recommended_movie.url }}" class="btn btn-primary">Movie Link</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock content %}
